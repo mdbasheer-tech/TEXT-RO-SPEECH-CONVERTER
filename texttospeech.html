@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Text-to-Speech Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.5s ease;
+        }
+
+        .container {
+            background-color: #2d3748;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            width: 95%; /* Increased width */
+            max-width: 800px; /* Increased max-width */
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        h1 {
+            color: #f7fafc;
+            margin-bottom: 30px;
+            transition: color 0.3s ease;
+            font-weight: 600;
+            font-size: 2.5em; /* Increased font size */
+        }
+
+        textarea {
+            width: calc(100% - 32px); /* Adjusted width for larger padding */
+            padding: 20px; /* Increased padding */
+            margin-bottom: 30px;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            font-size: 18px; /* Increased font size */
+            resize: vertical;
+            min-height: 180px; /* Increased height */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            color: #f7fafc;
+            background-color: #4a5568;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .select-group,
+        .range-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+
+        label {
+            color: #cbd5e0;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            font-size: 1.1rem; /* Increased font size */
+        }
+
+        select,
+        input[type="range"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            font-size: 18px; /* Increased font size */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            color: #f7fafc;
+            background-color: #4a5568;
+        }
+
+        select:focus,
+        input[type="range"]:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23cbd5e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center; /* Increased padding */
+            background-size: 16px;
+            padding-right: 40px; /* Increased padding */
+        }
+
+        select:focus {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23a78bfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #4a5568;
+            height: 8px;
+            border-radius: 10px;
+            outline: none;
+            margin-top: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #a78bfa;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #a78bfa;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover,
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active,
+        input[type="range"]::-moz-range-thumb:active {
+            transform: scale(1.2);
+        }
+
+        #pitchValue,
+        #rateValue {
+            color: #e2e8f0;
+            width: 48px;
+            text-align: center;
+            font-size: 18px; /* Increased font size */
+            font-weight: 500;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 30px; /* Increased margin */
+            flex-wrap: wrap; /* Added wrap for smaller screens */
+        }
+
+        button {
+            padding: 14px 30px;
+            font-size: 20px; /* Increased font size */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            min-width: 150px; /* Added minimum width */
+            flex: 1 0 auto; /* added to make buttons have equal width and not shrink*/
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        #speakButton {
+            background-color: #a7f3d0;
+            color: #065f46;
+        }
+
+        #speakButton:hover {
+            background-color: #34d399;
+            color: #065f46;
+        }
+
+        #stopButton, #pauseButton, #resumeButton {
+            background-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        #stopButton:hover, #pauseButton:hover, #resumeButton:hover {
+            background-color: #f87171;
+            color: #991b1b;
+        }
+
+        button:disabled {
+            background-color: #6b7280;
+            color: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #progress {
+            width: 100%;
+            height: 12px;
+            background-color: #4a5568;
+            border-radius: 10px;
+            margin-top: 24px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            background-color: #a78bfa;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 24px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .select-group,
+            .range-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            label {
+                width: auto;
+                margin-bottom: 8px;
+                font-size: 1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px 24px;
+                font-size: 18px;
+                min-width: auto;
+                flex: 1 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text-to-Speech Converter</h1>
+        <textarea id="textInput" placeholder="Enter text here..."></textarea>
+        <div class="controls">
+            <div class="select-group">
+                <label for="voice">Voice:</label>
+                <select id="voice"></select>
+            </div>
+            <div class="range-group">
+                <label for="pitch">Pitch:</label>
+                <input type="range" id="pitch" min="0.5" max="2" value="1" step="0.1">
+                <span id="pitchValue">1</span>
+            </div>
+            <div class="range-group">
+                <label for="rate">Speed:</label>
+                <input type="range" id="rate" min="0.5" max="2" value="1" step="0.1">
+                <span id="rateValue">1</span>
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="speakButton">Convert to Speech</button>
+            <button id="stopButton" disabled>Stop</button>
+            <button id="pauseButton" disabled>Pause</button>
+            <button id="resumeButton" disabled>Resume</button>
+        </div>
+        <div id="progress">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+    <script>
+        const textInput = document.getElementById('textInput');
+        const voiceSelect = document.getElementById('voice');
+        const pitchInput = document.getElementById('pitch');
+        const pitchValueSpan = document.getElementById('pitchValue');
+        const rateInput = document.getElementById('rate');
+        const rateValueSpan = document.getElementById('rateValue');
+        const speakButton = document.getElementById('speakButton');
+        const stopButton = document.getElementById('stopButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const resumeButton = document.getElementById('resumeButton');
+        const progressBar = document.getElementById('progress-bar');
+
+        let speechSynthesis = window.speechSynthesis;
+        let voices = [];
+        let utterance = new SpeechSynthesisUtterance();
+        let isPaused = false;
+        let speaking = false; // Track speaking state
+
+        const languageVoices = {
+            'en-US': 'English (US)',
+            'en-GB': 'English (UK)',
+            'es-ES': 'Spanish (Spain)',
+            'es-MX': 'Spanish (Mexico)',
+            'fr-FR': 'French (France)',
+            'de-DE': 'German (Germany)',
+            'it-IT': 'Italian (Italy)',
+            'ja-JP': 'Japanese (Japan)',
+            'zh-CN': 'Chinese (China)',
+            'ru-RU': 'Russian (Russia)',
+            'pt-BR': 'Portuguese (Brazil)',
+            'nl-NL': 'Dutch (Netherlands)',
+            'ko-KR': 'Korean (South Korea)',
+            'ar-SA': 'Arabic (Saudi Arabia)',
+            'hi-IN': 'Hindi (India)',
+        };
+
+        function populateVoiceList() {
+            voices = speechSynthesis.getVoices().sort((a, b) => a.name.localeCompare(b.name));
+            voiceSelect.innerHTML = '';
+
+            let selectedLanguageCode = 'en-US';
+            if (navigator.language) {
+                selectedLanguageCode = navigator.language;
+            }
+
+            let defaultVoiceName = '';
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                const langCode = voice.lang;
+                const languageName = languageVoices[langCode] || voice.lang;
+                option.textContent = `${voice.name} (${languageName})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+
+                if (langCode === selectedLanguageCode) {
+                    defaultVoiceName = voice.name;
+                }
+            });
+
+            if (defaultVoiceName) {
+                utterance.voice = voices.find(voice => voice.name === defaultVoiceName) || voices[0];
+                voiceSelect.value = defaultVoiceName;
+            } else if (voices.length > 0) {
+                utterance.voice = voices[0];
+            }
+        }
+
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+
+        function speakText() {
+            if (speaking) return;
+            if (speechSynthesis.speaking || speechSynthesis.paused) {
+                return;
+            }
+            utterance.text = textInput.value;
+            utterance.voice = voices.find(voice => voice.name === voiceSelect.value) || voices[0];
+            utterance.pitch = parseFloat(pitchInput.value);
+            utterance.rate = parseFloat(rateInput.value);
+            utterance.onend = () => {
+                speakButton.disabled = false;
+                stopButton.disabled = true;
+                pauseButton.disabled = true;
+                resumeButton.disabled = true;
+                progressBar.style.width = '0%';
+                speaking = false; // Reset speaking state
+            };
+            utterance.onboundary = (event) => {
+                if (event.charLength > 0 && event.elapsedTime > 0 && utterance.duration) {
+                    const percent = (event.elapsedTime / utterance.duration) * 100;
+                    progressBar.style.width = `${percent}%`;
+                }
+            };
+            speechSynthesis.speak(utterance);
+            speakButton.disabled = true;
+            stopButton.disabled = false;
+            pauseButton.disabled = false;
+            resumeButton.disabled = true;
+            isPaused = false;
+            speaking = true; // Set speaking state
+            progressBar.style.width = '0%';
+        }
+
+        function stopSpeech() {
+            speechSynthesis.cancel();
+            speakButton.disabled = false;
+            stopButton.disabled = true;
+            pauseButton.disabled = true;
+            resumeButton.disabled = true;
+            progressBar.style.width = '0%';
+            speaking = false; // Reset speaking state
+        }
+
+        function pauseSpeech() {
+            if (speechSynthesis.speaking && !isPaused) {
+                speechSynthesis.pause();
+                isPaused = true;
+                pauseButton.disabled = true;
+                resumeButton.disabled = false;
+            }
+        }
+
+        function resumeSpeech() {
+            if (isPaused) {
+                speechSynthesis.resume();
+                isPaused = false;
+                pauseButton.disabled = false;
+                resumeButton.disabled = true;
+            }
+        }
+
+        pitchInput.addEventListener('input', () => {
+            pitchValueSpan.textContent = pitchInput.value;
+        });
+
+        rateInput.addEventListener('input', () => {
+            rateValueSpan.textContent = rateInput.value;
+        });
+
+        speakButton.addEventListener('click', speakText);
+        stopButton.addEventListener('click', stopSpeech);
+        pauseButton.addEventListener('click', pauseSpeech);
+        resumeButton.addEventListener('click', resumeSpeech);
+
+        populateVoiceList();
+    </script>
+</body>
+</html>
